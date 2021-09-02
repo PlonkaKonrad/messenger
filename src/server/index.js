@@ -124,48 +124,22 @@ app.post('/messenger-api-register', (req,res) => {
 ///////////////////////////////////////////////////////////////////////////////////////// SEND MESSAGE 
 
 app.post('/messenger-api-sendMessage', (req,res) => {
+
+    console.log(req.body)
     MongoClient.connect(mongodbURL, {}, (error,client) => {
         if(error) console.log('Cannot connect to the database', error)
         else{
             const db = client.db(mongodbNAME)
 
             db.collection('Messages').find({
-                users: {$all: [id1,id2]}
+                users: {$all: [req.body.from,req.body.to]}
                 // tutaj wrzucać id zalogowanego usera oraz klikniętego
             }).toArray((error,result) => {
                 if(error) {
                     console.log(error)
                 }else{
-                    if(result.length > 0 && result[0].email == req.body.email){
-                        res.send({message:'Email jest już zajęty', error: true});
-                        res.end()
-                    }else{
-                        //po znalezieniu dokumentu zawierającego oba idiki skopiować tablice, zpuszować do niej nową wiadomość a następnie nadpisać obiekt messages w DB
-                        
-                        db.collection('Users').insertOne({
-                                userID: req.body.id,
-                                userName: req.body.name,
-                                userSurname: req.body.surname,
-                                userEmail: req.body.email,
-                                userPassword: passwordHash.generate(req.body.password),
-                                userImage: 'https://cdn.pixabay.com/photo/2018/04/18/18/56/user-3331257__340.png',
-                                createdAt: new Date(),
-                                lastLogin: new Date(),
-                            }, (error, result)=>{
-                            if(error) {
-                                res.send({message:'Nie udało się zarejestrować użytkownika', error: true})
-                                res.end()
-                            }
-                            else{
-                                console.log(result.acknowledged)
-                               
-                                if(result.acknowledged){
-                                     res.send({message: 'Zarejestrowano poprawnie', error: false});
-                                }
-                                
-                            }
-                        })  
-                    }
+                    console.log(result)
+                    res.send({message:'znaleziono i wysłano'})
                 }
             })
           
@@ -174,7 +148,6 @@ app.post('/messenger-api-sendMessage', (req,res) => {
         
     })
 })
-
 
 //////////////////////////////////////////////////////////////////////////////////////// GET CONVERSATIONS LIST 
 

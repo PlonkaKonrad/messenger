@@ -64,11 +64,27 @@ const Home = (props) => {
                     })
                     .then(response => response.json())
                     .then(data => {
-                        setcurrentSomeone(`${data[0].userName} ${data[0].userSurname}`)
+                        setcurrentSomeone(data[0].userID)
                     })
                 }
             })
         })
+    }
+
+    const sendMessage = (from, to, content) => {
+        fetch('/messenger-api-sendMessage', {
+            method: 'POST',
+            headers: {
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({
+                from: from,
+                to: to, 
+                content: content
+            })
+        })
+        .then(result => result.json())
+        // .then(data => console.log(data))
     }
 
     return ( 
@@ -81,6 +97,8 @@ const Home = (props) => {
                 messages = {messages}
                 userID = {props.state.userID}
                 currentSomeone = {currentSomeone}
+                state = {props.state}
+                sendMessage ={sendMessage}
             />
         </StyledHomeWrapper>
      );
@@ -310,6 +328,7 @@ const StyledMessagesTopbar = styled.div`
     font-weight: 700;
 `;
 const Messages = (props) => {
+        const [messageContent, setmessageContent] = useState('');
 
     // uzyc useeffect i fetchować po jsona na podstawie id użytkownika
     /*
@@ -375,8 +394,8 @@ const Messages = (props) => {
                 {displayMessages}
             <StyledNewMessageForm>
                 <section>
-                    <input type='text' placeholder='Wiadomość'></input>
-                    <button><BiSend/></button>
+                    <input value={messageContent} onChange={(e)=>setmessageContent(e.target.value)}type='text' placeholder='Wiadomość'></input>
+                    <button onClick={() => props.sendMessage(props.state.userID, props.currentSomeone, messageContent)}><BiSend/></button>
                 </section>
             </StyledNewMessageForm>
         </StyledMessages>
