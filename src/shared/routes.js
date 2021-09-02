@@ -10,7 +10,7 @@ const routes = [{
         component: Home,
     },
     {
-        path: '/payment',
+        path: '/login',
         exact: true,
         component: Login,
     },
