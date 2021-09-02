@@ -25,7 +25,7 @@ app.use(cookieParser());
 
 // MONGO database parameters
 const mongodbURL = 'mongodb://127.0.0.1:27017';
-const mongodbNAME = 'CKZ';
+const mongodbNAME = 'Messenger';
 
 
 
@@ -66,54 +66,54 @@ const mongodbNAME = 'CKZ';
     
 ///////////////////////////////////////////////////////////////////////////////////////// REGISTER NEW USER
 
-// app.post('/ckz-api-registerNewUser', (req,res) => {
+app.post('/messenger-api-register', (req,res) => {
     
-//     MongoClient.connect(mongodbURL, {}, (error,client) => {
-//         if(error) console.log('Cannot connect to the database', error)
-//         else{
-//             const db = client.db(mongodbNAME)
+    MongoClient.connect(mongodbURL, {}, (error,client) => {
+        if(error) console.log('Cannot connect to the database', error)
+        else{
+            const db = client.db(mongodbNAME)
 
-//             db.collection('Users').find({
-//                 email: req.body.email
-//             }).toArray((error,result) => {
-//                 if(error) {
-//                     console.log(error)
-//                 }else{
-//                     if(result.length > 0 && result[0].email == req.body.email){
-//                         res.send({message:'Email jest już zajęty', error: true});
-//                         res.end()
-//                     }else{
-//                         db.collection('Users').insertOne({
-//                                 name: req.body.name,
-//                                 surname: req.body.surname,
-//                                 email: req.body.email,
-//                                 password: passwordHash.generate(req.body.password),
-//                                 createdAt: new Date(),
-//                                 lastLogin: new Date(),
-//                                 accountConfirmed: false,
-//                             }, (error, result)=>{
-//                             if(error) {
-//                                 res.send({message:'Nie udało się zarejestrować użytkownika', error: true})
-//                                 res.end()
-//                             }
-//                             else{
-//                                 console.log(result.acknowledged)
+            db.collection('Users').find({
+                email: req.body.email
+            }).toArray((error,result) => {
+                if(error) {
+                    console.log(error)
+                }else{
+                    if(result.length > 0 && result[0].email == req.body.email){
+                        res.send({message:'Email jest już zajęty', error: true});
+                        res.end()
+                    }else{
+                        
+                        db.collection('Users').insertOne({
+                                name: req.body.name,
+                                surname: req.body.surname,
+                                email: req.body.email,
+                                password: passwordHash.generate(req.body.password),
+                                createdAt: new Date(),
+                                lastLogin: new Date(),
+                            }, (error, result)=>{
+                            if(error) {
+                                res.send({message:'Nie udało się zarejestrować użytkownika', error: true})
+                                res.end()
+                            }
+                            else{
+                                console.log(result.acknowledged)
                                
-//                                 if(result.acknowledged){
-//                                     res.send({message: 'Zarejestrowano poprawnie', error: false});
-//                                 }
+                                if(result.acknowledged){
+                                    res.send({message: 'Zarejestrowano poprawnie', error: false});
+                                }
                                 
-//                             }
-//                         })  
-//                     }
-//                 }
-//             })
+                            }
+                        })  
+                    }
+                }
+            })
           
             
-//         }    
+        }    
         
-//     })
-// })
+    })
+})
 
 
 
