@@ -34,7 +34,8 @@ const StyledInnerWrapper = styled.div`
 
 class App extends Component {
     state = {
-     userLogged: false,
+        userID: 'konrad',
+        currentSomeoneID: '',
     }
 
 
@@ -58,17 +59,7 @@ class App extends Component {
                             render = {
                                 (props) => ( 
                                     <C 
-                                        changeQuantity = { this.changeQuantity } 
-                                        state={this.state}
-                                        handleIsInvoiceNeeded = {this.handleIsInvoiceNeeded}
-                                        removeFromCart = {this.removeFromCart}
-                                        notification = {this.notification}
-                                        choosePaymentMethod = {this.choosePaymentMethod}
-                                        notification = {this.notification}
-                                        setFormDetails = {this.setFormDetails}
-                                        setLoginUser = {this.setLoginUser}
-                                        chooseDeliveryForPackage={this.chooseDeliveryForPackage}
-                                        setDeliveryDetailsForKurier={this.setDeliveryDetailsForKurier}
+                                        state ={this.state}
                                         /> 
                                 )
                             }

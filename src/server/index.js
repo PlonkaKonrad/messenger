@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { response } from 'express';
 import cors from 'cors';
 import { renderToString} from 'react-dom/server';
 import App from '../shared/App';
@@ -131,6 +131,7 @@ app.post('/messenger-api-sendMessage', (req,res) => {
 
             db.collection('Messages').find({
                 users: {$all: [id1,id2]}
+                // tutaj wrzucać id zalogowanego usera oraz klikniętego
             }).toArray((error,result) => {
                 if(error) {
                     console.log(error)
@@ -173,6 +174,61 @@ app.post('/messenger-api-sendMessage', (req,res) => {
         
     })
 })
+
+
+//////////////////////////////////////////////////////////////////////////////////////// GET CONVERSATIONS LIST 
+
+app.post('/messenger-api-getConversationsList', (req,res) => {
+
+    MongoClient.connect(mongodbURL, {}, (error,client) => {
+        if(error) console.log('Cannot connect to the database', error)
+        else{
+            const db = client.db(mongodbNAME)
+            db.collection('ConversationsLists').find({
+                userID: req.body.userID
+            }).toArray((error,result) => {
+                if(error) {
+                    console.log(error)
+                }else if(result.length === 0){
+                    console.log('Brak listy znajomych')
+
+                    res.send({message:'Brak listy znajomych', error: true})
+                }else if(result.length > 0){
+
+
+                        console.log('Znaleziono listę znajomych')
+                        res.send(result)
+                    
+                }
+        })
+
+    }})
+})
+
+////////////////////////////////////////////////////////////////////////////////////// GET MESSAGES
+
+app.post('/messenger-api-getMessages', (req,res) => {
+    MongoClient.connect(mongodbURL, {}, (error,client) => {
+        if(error) console.log('Cannot connect to the database', error)
+        else{
+            const db = client.db(mongodbNAME)
+
+            db.collection('Messages').find({
+                users: {$all: [req.body.id1,req.body.id2]}
+            }).toArray((error,result) => {
+                if(error) {
+                    console.log(error)
+                }else{
+                    console.log(result)
+                        res.send(result)
+                }
+            })
+        
+        }    
+        
+    })
+})
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////// SERVER SIDE RENDERING

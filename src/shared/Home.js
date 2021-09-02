@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import {BiPlusCircle,BiDotsVerticalRounded,BiMenu,BiMinusBack,BiSearchAlt2, BiSend} from 'react-icons/bi';
+// import fetch from 'node-fetch';
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////// MAIN COMPONENT
 const StyledHomeWrapper = styled.div`
@@ -8,11 +9,65 @@ const StyledHomeWrapper = styled.div`
     height: 100%;
     display: flex;
 `;
-const Home = () => {
+const Home = (props) => {
+    const [conversations, setconversations] = useState([]);
+    const [isconversationsLoaded, setisconversationsLoaded] = useState(false);
+    const [messages, setmessages] = useState([]);
+        
+  
+    
+    useEffect(() => {
+        fetch('/messenger-api-getConversationsList',{
+            method: "POST",
+            body: JSON.stringify({
+                userID: props.state.userID // zmienić na dynamiczne
+            }),
+            headers: {
+                "Content-Type":"application/json"
+            }
+
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data[0].conversations)
+
+            sessionStorage.setItem('conversationsList', JSON.stringify(data[0].conversations))
+            if(!isconversationsLoaded){
+                setconversations(JSON.parse(sessionStorage.getItem('conversationsList')))
+            }
+            setisconversationsLoaded(true)
+
+        })
+    });
+
+
+    const getMessages = (id) => {
+        fetch('/messenger-api-getMessages', {
+            method: 'POST',
+            body:JSON.stringify({
+                id1: props.state.userID,
+                id2: id
+            }),
+            headers: {
+                "Content-Type":"application/json"
+            }
+        })
+        .then(result=> result.json())
+        .then(data => {
+            setmessages(data[0].messages)
+        })
+    }
+
     return ( 
         <StyledHomeWrapper>
-            <Contacts />
-            <Messages />
+            <Contacts 
+                conversations = {conversations}
+                getMessages = {getMessages}
+            />
+            <Messages 
+                messages = {messages}
+                userID = {props.state.userID}
+            />
         </StyledHomeWrapper>
      );
 }
@@ -73,7 +128,17 @@ const StyledContactsUsersList = styled.div`
     flex-direction: column;
 `;
 
-const Contacts = () => {
+const Contacts = (props) => {
+
+    const displayContacts = props.conversations.map(conversation => {
+        return(
+            <Contact 
+                conversation = {conversation}
+                getMessages = {props.getMessages}
+            /> 
+        )
+    })
+
     return ( 
         <StyledContactList>
             <StyledContactsTopBar>
@@ -88,10 +153,7 @@ const Contacts = () => {
                 <button><BiPlusCircle/>Nowa wiadomość</button>
             </StyledContactsTopBar>
             <StyledContactsUsersList>
-                <Contact /> 
-                <Contact /> 
-                <Contact /> 
-                <Contact /> 
+                {displayContacts}
             </StyledContactsUsersList>
         </StyledContactList>
      );
@@ -106,6 +168,11 @@ const StyledContactWrapper = styled.div`
     box-sizing: border-box;
     justify-content: space-between;
     padding: 10px;
+    cursor: pointer;
+
+    :hover{
+        filter: brightness(0.8);
+    }
 
     section{
         display: flex;
@@ -145,18 +212,18 @@ const StyledContactWrapper = styled.div`
     
 `;
 
-const Contact = () => {
+const Contact = (props) => {
     return ( 
-        <StyledContactWrapper>
+        <StyledContactWrapper onClick={() => props.getMessages(props.conversation.userID)}>
             <section>
                 <div className='user-image' style={{backgroundImage: 'url(https://image.flaticon.com/icons/png/512/149/149071.png)'}}></div>
                 <div>
-                    <h5>Jan Nowak</h5>
-                    <p>Ty: Siema co robisz?</p>
+                    <h5>{props.conversation.userName} {props.conversation.userSurname}</h5>
+                    <p>{props.conversation.lastMsg}</p>
                 </div>
             </section>
             <div className='last-msg-time'>
-                <p>21.37</p>
+                <p>{props.conversation.createdAt}</p>
             </div>
 
         </StyledContactWrapper>
@@ -228,7 +295,7 @@ const StyledMessagesTopbar = styled.div`
     color: #000;
     font-weight: 700;
 `;
-const Messages = () => {
+const Messages = (props) => {
 
     // uzyc useeffect i fetchować po jsona na podstawie id użytkownika
     /*
@@ -264,17 +331,34 @@ const Messages = () => {
 
 
     */
+        const displayMessages = props.messages.map(message => {
+            
+            if(message.from === props.userID){
+                return(
+                    <UserMessage
+                        content = {message.content}
+                        createdAt = {message.createdAt}
+                    />
+                )
+            }else{
+                return(
+                    <SomeoneMessage
+                        content = {message.content}
+                        createdAt = {message.createdAt}
+                    />
+                )
+            }
+
+            
+        })
+        
+        
     return ( 
         <StyledMessages>
             <StyledMessagesTopbar>
                 <p>Jan Nowak</p>
             </StyledMessagesTopbar>
-                <SomeoneMessage/>
-                <UserMessage />
-                <SomeoneMessage/>
-                <SomeoneMessage/>
-                <UserMessage />
-                <UserMessage />
+                {displayMessages}
             <StyledNewMessageForm>
                 <section>
                     <input type='text' placeholder='Wiadomość'></input>
@@ -389,16 +473,16 @@ const StyledUserMessageWrapper = styled.div`
     }
 `;
 
-const UserMessage = () => {
+const UserMessage = (props) => {
     return ( 
         <StyledUserMessageWrapper>
             <section>
                 <p>
-                    siema co tam porabiasz?  Bo u mnie też nic ciekawego wiec ... 
+                    {props.content}
                 </p>
                 <div className='user-image' style={{backgroundImage: 'url(https://image.flaticon.com/icons/png/512/149/149071.png)'}}></div>
             </section>
-            <span>21.38</span>
+            <span>{props.createdAt}</span>
         </StyledUserMessageWrapper>
      );
 }
