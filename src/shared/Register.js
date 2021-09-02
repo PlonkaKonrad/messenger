@@ -47,7 +47,7 @@ const Register = () => {
             alert('Imię nie może być krótsze niż 3 znaki')
         }else if(surname.length < 3){
             alert('Nazwisko nie może być krótsze niż 3 znaki')
-        }else if(email.length < 6 && email.includes('@') && email.includes('.')){
+        }else if(email.length < 6 || !email.includes('@') || !email.includes('.')){
             alert('Podaj prawidłowy email')
         }else if(password.length < 6){
             alert('Hasło nie może być krótsze niż 6 znaków')

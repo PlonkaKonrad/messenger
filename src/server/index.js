@@ -31,43 +31,47 @@ const mongodbNAME = 'Messenger';
 
 ///////////////////////////////////////////////////////////////////////////////////////// LOGIN USER
 
-// app.post('/ckz-api-loginUser', (req,res) => {
-    // console.log('siema')
-//     MongoClient.connect(mongodbURL, {}, (error,client) => {
-//         if(error) console.log('Cannot connect to the database', error)
-//         else{
-//             const db = client.db(mongodbNAME)
-//             db.collection('Users').find({
-//                 email: req.body.email
-//             }).toArray((error,result) => {
-//                 if(error) {
-//                     console.log(error)
-//                 }else if(result.length === 0){
-//                     res.send({message:'Konto z podanym adresem email nie istnieje', error: true})
-//                 }else if(result.length > 0){
+app.post('/messenger-api-loginUser', (req,res) => {
 
-//                     if(passwordHash.verify(req.body.password,result[0].password)){
+    MongoClient.connect(mongodbURL, {}, (error,client) => {
+        if(error) console.log('Cannot connect to the database', error)
+        else{
+            const db = client.db(mongodbNAME)
+            db.collection('Users').find({
+                email: req.body.email
+            }).toArray((error,result) => {
+                if(error) {
+                    console.log(error)
+                }else if(result.length === 0){
+                    console.log('Nie ma takiego konta')
+
+                    res.send({message:'Konto z podanym adresem email nie istnieje', error: true})
+                }else if(result.length > 0){
+
+                    if(passwordHash.verify(req.body.password,result[0].password)){
                         
-//                         db.collection('Users').updateOne(
-//                             { email: req.body.email },
-//                             { $set: { lastLogin: new Date() }},
-//                             { upsert: true }
-//                         )
-                       
-//                         res.send({message:'Zalogowano pomyślnie', error: false, account:result[0]})
-//                     }else{
-//                         res.send({message:'Nieprawidłowe hasło', error: true})
-//                     }
-//                 }
-//         })
+                        db.collection('Users').updateOne(
+                            { email: req.body.email },
+                            { $set: { lastLogin: new Date() }},
+                            { upsert: true }
+                        )
+                        console.log('zalogowano pomyślnie')
+                        res.send({message:'Zalogowano pomyślnie', error: false, account:result[0]})
+                    }else{
+                        console.log('Nieprawidłowe hasło')
 
-//     }})
-// })
+                        res.send({message:'Nieprawidłowe hasło', error: true})
+                    }
+                }
+        })
+
+    }})
+})
     
 ///////////////////////////////////////////////////////////////////////////////////////// REGISTER NEW USER
 
 app.post('/messenger-api-register', (req,res) => {
-    
+
     MongoClient.connect(mongodbURL, {}, (error,client) => {
         if(error) console.log('Cannot connect to the database', error)
         else{
@@ -100,7 +104,7 @@ app.post('/messenger-api-register', (req,res) => {
                                 console.log(result.acknowledged)
                                
                                 if(result.acknowledged){
-                                    res.send({message: 'Zarejestrowano poprawnie', error: false});
+                                     res.send({message: 'Zarejestrowano poprawnie', error: false});
                                 }
                                 
                             }
