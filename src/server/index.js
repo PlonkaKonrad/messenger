@@ -131,15 +131,28 @@ app.post('/messenger-api-sendMessage', (req,res) => {
         else{
             const db = client.db(mongodbNAME)
 
+
+            db.collection('Messages').findOneAndUpdate({
+                users: {$all: [req.body.from,req.body.to]}
+            },{
+                $push: {messages: {
+                    from:req.body.from, 
+                    to:req.body.to, 
+                    content: req.body.content,
+                    createdAt: new Date()}}
+            })
+
+
             db.collection('Messages').find({
                 users: {$all: [req.body.from,req.body.to]}
-                // tutaj wrzucać id zalogowanego usera oraz klikniętego
+            
             }).toArray((error,result) => {
                 if(error) {
                     console.log(error)
                 }else{
+                    console.log('....................................................................')
                     console.log(result)
-                    res.send({message:'znaleziono i wysłano'})
+                    res.send(result)
                 }
             })
           

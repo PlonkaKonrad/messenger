@@ -84,7 +84,9 @@ const Home = (props) => {
             })
         })
         .then(result => result.json())
-        // .then(data => console.log(data))
+        .then(data => {
+            setmessages(data[0].messages)
+        })
     }
 
     return ( 
