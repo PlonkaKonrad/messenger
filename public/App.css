@@ -1,0 +1,41 @@
+
+
+@import url('https://fonts.googleapis.com/css2?family=Monoton&family=Roboto+Condensed:wght@300;400;700&display=swap');
+html{
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  --fancyfont: 'Monoton', cursive;
+  --font:'Roboto Condensed', sans-serif;
+  --darkGray: rgb(54, 54, 54);
+  --red: rgb(255, 0, 0);
+  --green: rgb(0, 255, 0);
+  --yellow: rgb(251, 255, 0);
+  --pink: rgb(255, 0, 157);
+  --darkPink: rgb(170, 0, 105);
+  --whiteTrans: rgba(255,255,255,0.3);
+  --theme: #00af91;
+
+  width: 100%;
+}
+
+
+body{
+    margin:0 !important;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+    
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font) !important;
+}
+button{
+  transition: 0.2s;
+}
+button:hover{
+  filter:brightness(0.8);
+}
