@@ -329,6 +329,19 @@ const StyledMessagesTopbar = styled.div`
     color: #000;
     font-weight: 700;
 `;
+
+const StyledMessagesList = styled.div`
+    overflow: auto;
+    width: 100%;
+    height: 450px;
+    -ms-overflow-style: none; 
+    scrollbar-width: none;
+
+    ::-webkit-scrollbar {
+        display: none;
+      }
+      
+`;
 const Messages = (props) => {
         const [messageContent, setmessageContent] = useState('');
 
@@ -387,17 +400,24 @@ const Messages = (props) => {
             
         })
         
+
+        const handleSendingMessage =() => {
+            setmessageContent('')
+            props.sendMessage(props.state.userID, props.currentSomeone, messageContent)
+        }
         
     return ( 
         <StyledMessages>
             <StyledMessagesTopbar>
                 <p>{props.currentSomeone}</p>
             </StyledMessagesTopbar>
+            <StyledMessagesList>
                 {displayMessages}
+            </StyledMessagesList>
             <StyledNewMessageForm>
                 <section>
                     <input value={messageContent} onChange={(e)=>setmessageContent(e.target.value)}type='text' placeholder='Wiadomość'></input>
-                    <button onClick={() => props.sendMessage(props.state.userID, props.currentSomeone, messageContent)}><BiSend/></button>
+                    <button onClick={handleSendingMessage}><BiSend/></button>
                 </section>
             </StyledNewMessageForm>
         </StyledMessages>
