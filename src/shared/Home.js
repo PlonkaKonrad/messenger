@@ -417,16 +417,16 @@ const StyledSomeoneMessageWrapper = styled.div`
     }
 `;
 
-const SomeoneMessage = () => {
+const SomeoneMessage = (props) => {
     return ( 
         <StyledSomeoneMessageWrapper>
             <section>
                 <div className='user-image' style={{backgroundImage: 'url(https://image.flaticon.com/icons/png/512/149/149071.png)'}}></div>
                 <p>
-                    siema co tam porabiasz? bo u mnie w sumie nic ciekawe :D  
+                    {props.content}
                 </p>
             </section>
-            <span>21.37</span>
+            <span>{props.createdAt}</span>
         </StyledSomeoneMessageWrapper>
      );
 }
