@@ -89,10 +89,65 @@ app.post('/messenger-api-register', (req,res) => {
                     }else{
                         
                         db.collection('Users').insertOne({
-                                name: req.body.name,
-                                surname: req.body.surname,
-                                email: req.body.email,
-                                password: passwordHash.generate(req.body.password),
+                                userID: req.body.id,
+                                userName: req.body.name,
+                                userSurname: req.body.surname,
+                                userEmail: req.body.email,
+                                userPassword: passwordHash.generate(req.body.password),
+                                userImage: 'https://cdn.pixabay.com/photo/2018/04/18/18/56/user-3331257__340.png',
+                                createdAt: new Date(),
+                                lastLogin: new Date(),
+                            }, (error, result)=>{
+                            if(error) {
+                                res.send({message:'Nie udało się zarejestrować użytkownika', error: true})
+                                res.end()
+                            }
+                            else{
+                                console.log(result.acknowledged)
+                               
+                                if(result.acknowledged){
+                                     res.send({message: 'Zarejestrowano poprawnie', error: false});
+                                }
+                                
+                            }
+                        })  
+                    }
+                }
+            })
+          
+            
+        }    
+        
+    })
+})
+
+///////////////////////////////////////////////////////////////////////////////////////// SEND MESSAGE 
+
+app.post('/messenger-api-sendMessage', (req,res) => {
+    MongoClient.connect(mongodbURL, {}, (error,client) => {
+        if(error) console.log('Cannot connect to the database', error)
+        else{
+            const db = client.db(mongodbNAME)
+
+            db.collection('Messages').find({
+                users: {$all: [id1,id2]}
+            }).toArray((error,result) => {
+                if(error) {
+                    console.log(error)
+                }else{
+                    if(result.length > 0 && result[0].email == req.body.email){
+                        res.send({message:'Email jest już zajęty', error: true});
+                        res.end()
+                    }else{
+                        //po znalezieniu dokumentu zawierającego oba idiki skopiować tablice, zpuszować do niej nową wiadomość a następnie nadpisać obiekt messages w DB
+                        
+                        db.collection('Users').insertOne({
+                                userID: req.body.id,
+                                userName: req.body.name,
+                                userSurname: req.body.surname,
+                                userEmail: req.body.email,
+                                userPassword: passwordHash.generate(req.body.password),
+                                userImage: 'https://cdn.pixabay.com/photo/2018/04/18/18/56/user-3331257__340.png',
                                 createdAt: new Date(),
                                 lastLogin: new Date(),
                             }, (error, result)=>{
@@ -120,7 +175,6 @@ app.post('/messenger-api-register', (req,res) => {
 })
 
 
-
 /////////////////////////////////////////////////////////////////////////////////////// SERVER SIDE RENDERING
 app.get('*', (req,res,next) => {
     const activeRoute = routes.find((route)=> matchPath(req.url, route)) || {}
@@ -129,7 +183,6 @@ app.get('*', (req,res,next) => {
     const markup = renderToString(sheet.collectStyles(<StaticRouter location={req.url} context={context}><App /></StaticRouter>))
 
     
-
 res.send(`
     <!DOCTYPE html>
     <html>

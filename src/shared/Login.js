@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import styled from 'styled-components';
-import {BiCheck} from 'react-icons/bi'
+import {BiCheck} from 'react-icons/bi';
+import { Link } from 'react-router-dom';
 
 const StyledLoginWrapper = styled.div`
     width: 100%;
@@ -29,6 +30,15 @@ const StyledLoginWrapper = styled.div`
         margin: 10px;
         cursor: pointer;
 
+    }
+
+    a{
+        text-decoration: none;
+        color: #bbb;
+    }
+    a:hover{
+        filter: brightness(0.5);
+        transition: 0.25s;
     }
 
 `;
@@ -76,6 +86,7 @@ const Login = () => {
             <input type='text' id='email' value={email} onChange={e => {handleForm(e)}} placeholder='Email'></input>
             <input type='password' id='password' value={password} onChange={e => {handleForm(e)}} placeholder='Hasło'></input>
             <button onClick={loginUser}>Zaloguj<BiCheck/></button>
+            <Link to='/register'>Zarejestruj się</Link>
         </StyledLoginWrapper>
      );
 }

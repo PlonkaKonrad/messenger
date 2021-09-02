@@ -149,7 +149,7 @@ const Contact = () => {
     return ( 
         <StyledContactWrapper>
             <section>
-                <div className='user-image' style={{backgroundImage: 'url(https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80)'}}></div>
+                <div className='user-image' style={{backgroundImage: 'url(https://image.flaticon.com/icons/png/512/149/149071.png)'}}></div>
                 <div>
                     <h5>Jan Nowak</h5>
                     <p>Ty: Siema co robisz?</p>
@@ -229,6 +229,41 @@ const StyledMessagesTopbar = styled.div`
     font-weight: 700;
 `;
 const Messages = () => {
+
+    // uzyc useeffect i fetchować po jsona na podstawie id użytkownika
+    /*
+        users: ['UserId1','Userid2']
+        messages: [
+            {from:'userID1', to:"userID2", content:'Siema co tam?', createdAt: '10.10.2020, 14.58'}
+            {from:'userID2', to:"userID1", content:'No nic a tam?', createdAt: '10.10.2020, 14.59'}
+        ] 
+
+        sprawdzać w bazie czy tabela users zawiera id zalogowanego użutkownika oraz id tego na którego kliknął
+        jeśli tak to 
+        zmapować wszystkie wiadomości jeśli zalogowany uzytkownik zgadza się z from wyświetlić komponent User jeśli się nie zgadza wyświetlić komponent someone
+
+
+        druga tabela z danymi to lista użytkowników z którymi pisał już user oraz ostatnia wiadomość z każdym z nich i godzina/data
+
+        userID: '123r34ferfv34v141g45g'
+        conversations: [
+            {userID: '12dsec3424cced', lastMsg: 'nara', createdAt:'20.03.12, 12.33'}
+        ]
+
+
+
+
+
+        trzecia tabela to informacje zawierające dane użytkoników do której będzie trzeba się odwoływać by zdobyć imie nazwisko i zdjęcie 
+        userID: '21yc328347fh834h4',
+        userName: 'Konrad'
+        userSurname: 'Płonka',
+        userEmail: 'dasd@adw.pl',
+        userPassword: '1232dj43983493n4i8h43h934ucvnkjnviuqer'
+        userImage: 'link do zdjęcia'
+
+
+    */
     return ( 
         <StyledMessages>
             <StyledMessagesTopbar>
@@ -302,7 +337,7 @@ const SomeoneMessage = () => {
     return ( 
         <StyledSomeoneMessageWrapper>
             <section>
-                <div className='user-image' style={{backgroundImage: 'url(https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80)'}}></div>
+                <div className='user-image' style={{backgroundImage: 'url(https://image.flaticon.com/icons/png/512/149/149071.png)'}}></div>
                 <p>
                     siema co tam porabiasz? bo u mnie w sumie nic ciekawe :D  
                 </p>
@@ -361,7 +396,7 @@ const UserMessage = () => {
                 <p>
                     siema co tam porabiasz?  Bo u mnie też nic ciekawego wiec ... 
                 </p>
-                <div className='user-image' style={{backgroundImage: 'url(https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80)'}}></div>
+                <div className='user-image' style={{backgroundImage: 'url(https://image.flaticon.com/icons/png/512/149/149071.png)'}}></div>
             </section>
             <span>21.38</span>
         </StyledUserMessageWrapper>

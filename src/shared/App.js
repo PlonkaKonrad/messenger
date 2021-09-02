@@ -34,7 +34,7 @@ const StyledInnerWrapper = styled.div`
 
 class App extends Component {
     state = {
-     
+     userLogged: false,
     }
 
 
