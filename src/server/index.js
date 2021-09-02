@@ -229,7 +229,29 @@ app.post('/messenger-api-getMessages', (req,res) => {
     })
 })
 
+/////////////////////////////////////////////////////////////////////////////////////// GET USER
 
+app.post('/messenger-api-getUser', (req,res) => {
+    MongoClient.connect(mongodbURL, {}, (error,client) => {
+        if(error) console.log('Cannot connect to the database', error)
+        else{
+            const db = client.db(mongodbNAME)
+
+            db.collection('Users').find({
+                userID: req.body.userID
+            }).toArray((error,result) => {
+                if(error) {
+                    console.log(error)
+                }else{
+                    console.log(result)
+                        res.send(result)
+                }
+            })
+        
+        }    
+        
+    })
+})
 
 /////////////////////////////////////////////////////////////////////////////////////// SERVER SIDE RENDERING
 app.get('*', (req,res,next) => {

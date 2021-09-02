@@ -13,7 +13,7 @@ const Home = (props) => {
     const [conversations, setconversations] = useState([]);
     const [isconversationsLoaded, setisconversationsLoaded] = useState(false);
     const [messages, setmessages] = useState([]);
-        
+    const [currentSomeone, setcurrentSomeone] = useState();
   
     
     useEffect(() => {
@@ -29,7 +29,6 @@ const Home = (props) => {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data[0].conversations)
 
             sessionStorage.setItem('conversationsList', JSON.stringify(data[0].conversations))
             if(!isconversationsLoaded){
@@ -55,6 +54,20 @@ const Home = (props) => {
         .then(result=> result.json())
         .then(data => {
             setmessages(data[0].messages)
+
+            data[0].users.forEach(user => {
+                if(user !== props.state.userID){
+                    fetch('/messenger-api-getUser', {
+                        method: 'POST',
+                        body: JSON.stringify({userID:user}),
+                        headers: {"Content-Type":"application/json"}
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        setcurrentSomeone(`${data[0].userName} ${data[0].userSurname}`)
+                    })
+                }
+            })
         })
     }
 
@@ -67,6 +80,7 @@ const Home = (props) => {
             <Messages 
                 messages = {messages}
                 userID = {props.state.userID}
+                currentSomeone = {currentSomeone}
             />
         </StyledHomeWrapper>
      );
@@ -356,7 +370,7 @@ const Messages = (props) => {
     return ( 
         <StyledMessages>
             <StyledMessagesTopbar>
-                <p>Jan Nowak</p>
+                <p>{props.currentSomeone}</p>
             </StyledMessagesTopbar>
                 {displayMessages}
             <StyledNewMessageForm>
