@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import {BiPlusCircle,BiDotsVerticalRounded,BiMenu,BiMinusBack,BiSearchAlt2, BiSend} from 'react-icons/bi';
-// import fetch from 'node-fetch';
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////// MAIN COMPONENT
 const StyledHomeWrapper = styled.div`
@@ -9,12 +8,18 @@ const StyledHomeWrapper = styled.div`
     height: 100%;
     display: flex;
 `;
+
+
+
 const Home = (props) => {
     const [conversations, setconversations] = useState([]);
     const [isconversationsLoaded, setisconversationsLoaded] = useState(false);
     const [messages, setmessages] = useState([]);
     const [currentSomeone, setcurrentSomeone] = useState();
   
+
+
+
     
     useEffect(() => {
         fetch('/messenger-api-getConversationsList',{
@@ -40,7 +45,28 @@ const Home = (props) => {
     });
 
 
+
+
+    const getUser = (id) => {
+        fetch('/messenger-api-getUser', {
+            method: 'POST',
+            body: JSON.stringify({userID:id}),
+            headers: {"Content-Type":"application/json"}
+        })
+        .then(response => response.json())
+        .then(data => {
+            // console.log(data[0])
+            setcurrentSomeone(data[0])
+        })
+    }
+
+
+
+
+
+
     const getMessages = (id) => {
+        setcurrentSomeone(id)
         fetch('/messenger-api-getMessages', {
             method: 'POST',
             body:JSON.stringify({
@@ -53,31 +79,27 @@ const Home = (props) => {
         })
         .then(result=> result.json())
         .then(data => {
+            console.log(data)
                 if(data.length>0){
                     setmessages(data[0].messages)
 
                     data[0].users.forEach(user => {
                         if(user !== props.state.userID){
-                            fetch('/messenger-api-getUser', {
-                                method: 'POST',
-                                body: JSON.stringify({userID:user}),
-                                headers: {"Content-Type":"application/json"}
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                
-                                setcurrentSomeone(data[0].userID)
-                            })
+                            getUser(user)
                         }
                     })
                 }else{
-                
-                    //TODO wykonać funkcję pierwszej wiadomości
+                    setmessages([[{from:"none",to:"someone",content:"Napisz coś",createdAt:new Date()}]])
                 }
         })
     }
 
-    const sendMessage = (from, to, content) => {
+
+
+
+
+
+    const sendMessage = (from, content) => {
         fetch('/messenger-api-sendMessage', {
             method: 'POST',
             headers: {
@@ -85,7 +107,7 @@ const Home = (props) => {
             },
             body: JSON.stringify({
                 from: from,
-                to: to, 
+                to: currentSomeone.userID, 
                 content: content
             })
         })
@@ -95,12 +117,19 @@ const Home = (props) => {
         })
     }
 
+
+
+
+
+
+
     return ( 
         <StyledHomeWrapper>
             <Contacts 
                 conversations = {conversations}
                 getMessages = {getMessages}
                 state = {props.state}
+                getUser = {getUser}
             />
             <Messages 
                 messages = {messages}
@@ -214,6 +243,7 @@ const Contacts = (props) => {
             <Contact 
                 conversation = {conversation}
                 getMessages = {props.getMessages}
+                getUser = {props.getUser}
             /> 
         )
     })
@@ -346,8 +376,15 @@ const StyledContactWrapper = styled.div`
 `;
 
 const Contact = (props) => {
+
+    const handleClickOnUser = () => {
+        props.getMessages(props.conversation.userID)
+        props.getUser(props.conversation.userID)
+    }
+
+
     return ( 
-        <StyledContactWrapper onClick={() => props.getMessages(props.conversation.userID)}>
+        <StyledContactWrapper onClick={handleClickOnUser}>
             <section>
                 <div className='user-image' style={{backgroundImage: 'url(https://image.flaticon.com/icons/png/512/149/149071.png)'}}></div>
                 <div>
@@ -358,7 +395,6 @@ const Contact = (props) => {
             <div className='last-msg-time'>
                 <p>{props.conversation.createdAt}</p>
             </div>
-
         </StyledContactWrapper>
      );
 }
@@ -441,6 +477,18 @@ const StyledMessagesList = styled.div`
       }
       
 `;
+
+const StyledNoMessages = styled.div`
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #bbb;
+
+`;
+
+
 const Messages = (props) => {
         const [messageContent, setmessageContent] = useState('');
 
@@ -475,9 +523,9 @@ const Messages = (props) => {
         userEmail: 'dasd@adw.pl',
         userPassword: '1232dj43983493n4i8h43h934ucvnkjnviuqer'
         userImage: 'link do zdjęcia'
-
-
     */
+
+
         const displayMessages = props.messages.map(message => {
             
             if(message.from === props.userID){
@@ -487,36 +535,51 @@ const Messages = (props) => {
                         createdAt = {message.createdAt}
                     />
                 )
-            }else{
+            }else if(message.from === props.currentSomeone.userID){
                 return(
                     <SomeoneMessage
                         content = {message.content}
                         createdAt = {message.createdAt}
                     />
                 )
+            }else {
+
+                console.log(message)
+                return(
+                    <StyledNoMessages>
+                        <h4>{message[0].content}</h4>
+                    </StyledNoMessages>
+                )
             }
 
-            
         })
         
 
         const handleSendingMessage =() => {
             setmessageContent('')
-            props.sendMessage(props.state.userID, props.currentSomeone, messageContent)
+            props.sendMessage(props.state.userID, messageContent)
         }
+
+        const handleKeyPress = (event) => {
+            if(event.key === 'Enter'){
+                handleSendingMessage();
+              }
+        }
+
+
         
     return ( 
         <StyledMessages>
             <StyledMessagesTopbar>
-                <p>{props.currentSomeone}</p>
+                <p>{props.currentSomeone? `${props.currentSomeone.userName} ${props.currentSomeone.userSurname}`: null}</p>
             </StyledMessagesTopbar>
-            <StyledMessagesList>
+            <StyledMessagesList >
                 {displayMessages}
             </StyledMessagesList>
             <StyledNewMessageForm>
                 <section>
-                    <input value={messageContent} onChange={(e)=>setmessageContent(e.target.value)}type='text' placeholder='Wiadomość'></input>
-                    <button onClick={handleSendingMessage}><BiSend/></button>
+                    <input value={messageContent} onKeyPress={handleKeyPress} onChange={(e)=>setmessageContent(e.target.value)}type='text' placeholder='Wiadomość'></input>
+                    <button onClick={handleSendingMessage} ><BiSend/></button>
                 </section>
             </StyledNewMessageForm>
         </StyledMessages>

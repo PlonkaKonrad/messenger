@@ -124,7 +124,6 @@ app.post('/messenger-api-register', (req,res) => {
 
 app.post('/messenger-api-sendMessage', (req,res) => {
 
-    console.log(req.body)
     MongoClient.connect(mongodbURL, {}, (error,client) => {
         if(error) console.log('Cannot connect to the database', error)
         else{

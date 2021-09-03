@@ -73,3 +73,7 @@ class App extends Component {
 
 export default App;
 
+// TODO naprawić powielanie użytkowników w liście konwersacji 
+// TODO naprawić tworzenie obiektu wiadomości przy pierwszej wiadomości a w innym wypoadku dopisywanie do już istniejącego obiektu
+// TODO pobieranie listy konwersacji jeśli ktoś napisał do kogoś wiadomość to powinna zostać dla drugiego użytkownika automatycznie lista konwersacji 
+// TODO wysyłanie wiadomości po naciśnięciu entera 
