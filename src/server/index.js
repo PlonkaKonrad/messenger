@@ -120,7 +120,6 @@ app.post('/messenger-api-register', (req,res) => {
         
     })
 })
-
 ///////////////////////////////////////////////////////////////////////////////////////// SEND MESSAGE 
 
 app.post('/messenger-api-sendMessage', (req,res) => {
@@ -131,16 +130,26 @@ app.post('/messenger-api-sendMessage', (req,res) => {
         else{
             const db = client.db(mongodbNAME)
 
-
-            db.collection('Messages').findOneAndUpdate({
-                users: {$all: [req.body.from,req.body.to]}
-            },{
-                $push: {messages: {
+            db.collection('Messages').insertOne({
+                users: [req.body.from,req.body.to],
+                messages: {
                     from:req.body.from, 
                     to:req.body.to, 
                     content: req.body.content,
-                    createdAt: new Date()}}
+                    createdAt: new Date()
+                }
             })
+
+            // db.collection('Messages').findOneAndUpdate({
+            //     users: {$all: [req.body.from,req.body.to]}
+            // },{
+            //     $addToSet: {messages: {
+            //         from:req.body.from, 
+            //         to:req.body.to, 
+            //         content: req.body.content,
+            //         createdAt: new Date()
+            //     }}
+            // })
 
 
             db.collection('Messages').find({
@@ -234,6 +243,79 @@ app.post('/messenger-api-getUser', (req,res) => {
                 }
             })
         
+        }    
+        
+    })
+})
+
+/////////////////////////////////////////////////////////////////////////////////////// GET ALL USERS 
+
+app.post('/messenger-api-getAllUsers', (req,res) => {
+    MongoClient.connect(mongodbURL, {}, (error,client) => {
+        if(error) console.log('Cannot connect to the database', error)
+        else{
+            const db = client.db(mongodbNAME)
+
+            db.collection('Users').find({
+            }).toArray((error,result) => {
+                if(error) {
+                    console.log(error)
+                }else{
+                    console.log(result)
+                        res.send(result)
+                }
+            })
+        
+        }    
+        
+    })
+})
+
+/////////////////////////////////////////////////////////////////////////////////////// ADD USER TO CONVERSATIONS LIST
+
+app.post('/messenger-api-addUserToConversationList', (req,res) => {
+    console.log(req.body)
+    MongoClient.connect(mongodbURL, {}, (error,client) => {
+        if(error) console.log('Cannot connect to the database', error)
+        else{
+            const db = client.db(mongodbNAME)
+        
+          
+            db.collection('ConversationsLists').findOneAndUpdate({
+                userID: req.body.userID
+            },{
+
+
+                $addToSet:{conversations:{
+                    userID: req.body.someoneID,
+                    lastMsg: req.body.lastMsg,
+                    createdAt: new Date(),
+                    userName: req.body.userName,
+                    userSurname: req.body.userSurname
+                }}
+
+
+
+
+            },{
+                // new: true,
+                upsert: true,
+            }),
+            
+
+            db.collection('ConversationsLists').find({
+                userID: req.body.userID   
+            }).toArray((error,result) => {
+                if(error) {
+                    console.log(error)
+                }else{
+                    console.log('....................................................................')
+                    console.log(result)
+                    res.send(result)
+                }
+            })
+          
+            
         }    
         
     })

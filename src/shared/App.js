@@ -34,12 +34,10 @@ const StyledInnerWrapper = styled.div`
 
 class App extends Component {
     state = {
-        userID: 'konrad',
+        userID: '5e264cf0-f5bb-4115-9763-6fa4a0ae4ed2',
         currentSomeoneID: '',
     }
 
-
-   
     
     render() {
         

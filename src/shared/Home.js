@@ -53,21 +53,27 @@ const Home = (props) => {
         })
         .then(result=> result.json())
         .then(data => {
-            setmessages(data[0].messages)
+                if(data.length>0){
+                    setmessages(data[0].messages)
 
-            data[0].users.forEach(user => {
-                if(user !== props.state.userID){
-                    fetch('/messenger-api-getUser', {
-                        method: 'POST',
-                        body: JSON.stringify({userID:user}),
-                        headers: {"Content-Type":"application/json"}
+                    data[0].users.forEach(user => {
+                        if(user !== props.state.userID){
+                            fetch('/messenger-api-getUser', {
+                                method: 'POST',
+                                body: JSON.stringify({userID:user}),
+                                headers: {"Content-Type":"application/json"}
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                
+                                setcurrentSomeone(data[0].userID)
+                            })
+                        }
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        setcurrentSomeone(data[0].userID)
-                    })
+                }else{
+                
+                    //TODO wykonać funkcję pierwszej wiadomości
                 }
-            })
         })
     }
 
@@ -94,6 +100,7 @@ const Home = (props) => {
             <Contacts 
                 conversations = {conversations}
                 getMessages = {getMessages}
+                state = {props.state}
             />
             <Messages 
                 messages = {messages}
@@ -114,6 +121,7 @@ const StyledContactList = styled.div`
     height: 100%;
     box-sizing: border-box;
     padding: 20px;
+    position: relative;
 
 `;
 
@@ -161,8 +169,45 @@ const StyledContactsUsersList = styled.div`
     display: flex;
     flex-direction: column;
 `;
+const StyledUsersModal = styled.div`
+    width: 100%;
+    height: 80%;
+    color: #bbb;
+`;
+const StyledUser = styled.div`
+    width: 100%;
+    height: 50px;
+    display: flex;
+    box-sizing: border-box;
+    padding: 5px;
+    align-items: center;
+    cursor: pointer;
+
+    :hover{
+        filter: brightness(0.5);
+    }
+
+    div{
+        height: 100%;
+        width: 40px;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        margin-right: 10px;
+
+        img{
+            max-width: 100%;
+            max-height: 100%;
+
+        }
+    }
+`;
 
 const Contacts = (props) => {
+    const [modalOpened, setmodalOpened] = useState(false);
+    const [allUsers, setallUsers] = useState([]);
 
     const displayContacts = props.conversations.map(conversation => {
         return(
@@ -173,8 +218,56 @@ const Contacts = (props) => {
         )
     })
 
+    const toggleModalWithUsers = () => {
+        setmodalOpened(!modalOpened)
+
+        fetch('/messenger-api-getAllUsers',{
+            method:'POST',
+            headers: {
+                "Content-Type":"application/json"
+            },
+        })
+        .then(response => response.json())
+        .then(data =>{
+            setallUsers(data)
+        })
+    }
+
+    const addUserToConversationList = (someoneID,userName,userSurname) => {
+        console.log('asi')
+        fetch('/messenger-api-addUserToConversationList', {
+            method: 'POST',
+            headers: {
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify({
+                userID: props.state.userID,             
+                someoneID: someoneID,
+                lastMsg: '',
+                userName: userName,
+                userSurname: userSurname,
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+            props.setconversations(data)
+        })
+    }
+ 
+
+    const displayAllUsers = allUsers.map(user => {
+        return(
+            <StyledUser onClick={() => addUserToConversationList(user.userID,user.userName,user.userSurname)}>
+                <div><img src={user.userImage} alt='user'></img></div>
+                <h5>{user.userName} {user.userSurname}</h5>
+            </StyledUser>
+        )
+    })
+
     return ( 
         <StyledContactList>
+            
             <StyledContactsTopBar>
                 <div>
                     <button><BiMenu/></button>
@@ -184,9 +277,15 @@ const Contacts = (props) => {
                         <button><BiDotsVerticalRounded/></button>
                     </section>
                 </div>
-                <button><BiPlusCircle/>Nowa wiadomość</button>
+                <button onClick={toggleModalWithUsers}><BiPlusCircle/>Nowa wiadomość</button>
             </StyledContactsTopBar>
             <StyledContactsUsersList>
+                {modalOpened?
+                    <StyledUsersModal>
+                        <h4>Do kogo chcesz napisać?</h4>
+                        {displayAllUsers}
+                    </StyledUsersModal>
+                :null}
                 {displayContacts}
             </StyledContactsUsersList>
         </StyledContactList>
