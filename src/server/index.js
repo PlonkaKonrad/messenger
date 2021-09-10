@@ -278,6 +278,17 @@ app.post('/messenger-api-addUserToConversationList', (req,res) => {
             const db = client.db(mongodbNAME)
 
 
+            db.collection('ConversationsLists').updateOne({
+                userID: req.body.userID
+            },{
+                $setOnInsert: {conversations: []}
+            },{
+                upsert:true 
+            })
+
+
+
+
             db.collection('ConversationsLists').find({
                 userID: req.body.userID   
             }).toArray((error,result) => {
