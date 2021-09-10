@@ -38,8 +38,9 @@ app.post('/messenger-api-loginUser', (req,res) => {
         else{
             const db = client.db(mongodbNAME)
             db.collection('Users').find({
-                email: req.body.email
+                userEmail: req.body.email
             }).toArray((error,result) => {
+                console.log(req.body.email)
                 if(error) {
                     console.log(error)
                 }else if(result.length === 0){
@@ -48,7 +49,7 @@ app.post('/messenger-api-loginUser', (req,res) => {
                     res.send({message:'Konto z podanym adresem email nie istnieje', error: true})
                 }else if(result.length > 0){
 
-                    if(passwordHash.verify(req.body.password,result[0].password)){
+                    if(passwordHash.verify(req.body.password,result[0].userPassword)){
                         
                         db.collection('Users').updateOne(
                             { email: req.body.email },
