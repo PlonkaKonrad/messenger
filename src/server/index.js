@@ -103,7 +103,7 @@ app.post('/messenger-api-register', (req,res) => {
                                 res.end()
                             }
                             else{
-                                console.log(result.acknowledged)
+                                // console.log(result.acknowledged)
                                
                                 if(result.acknowledged){
                                      res.send({message: 'Zarejestrowano poprawnie', error: false});
@@ -129,37 +129,38 @@ app.post('/messenger-api-sendMessage', (req,res) => {
         else{
             const db = client.db(mongodbNAME)
 
-            db.collection('Messages').insertOne({
-                users: [req.body.from,req.body.to],
-                messages: {
-                    from:req.body.from, 
-                    to:req.body.to, 
-                    content: req.body.content,
-                    createdAt: new Date()
-                }
+            
+            db.collection('Messages').updateOne({
+                users:  [req.body.from,req.body.to],
+            },{
+                $setOnInsert: {messages: []}
+            },{
+                upsert:true 
             })
 
-            // db.collection('Messages').findOneAndUpdate({
-            //     users: {$all: [req.body.from,req.body.to]}
-            // },{
-            //     $addToSet: {messages: {
-            //         from:req.body.from, 
-            //         to:req.body.to, 
-            //         content: req.body.content,
-            //         createdAt: new Date()
-            //     }}
-            // })
+
+
+            db.collection('Messages').findOneAndUpdate({
+                users: [req.body.from,req.body.to],
+
+            },{
+                $addToSet: {messages: {
+                            from:req.body.from, 
+                            to:req.body.to, 
+                            content: req.body.content,
+                            createdAt: new Date()
+                        }}
+            })
 
 
             db.collection('Messages').find({
-                users: {$all: [req.body.from,req.body.to]}
+                users: [req.body.from,req.body.to]
             
             }).toArray((error,result) => {
                 if(error) {
                     console.log(error)
                 }else{
                     console.log('....................................................................')
-                    console.log(result)
                     res.send(result)
                 }
             })
@@ -237,7 +238,7 @@ app.post('/messenger-api-getUser', (req,res) => {
                 if(error) {
                     console.log(error)
                 }else{
-                    console.log(result)
+                    // console.log(result)
                         res.send(result)
                 }
             })
@@ -260,7 +261,7 @@ app.post('/messenger-api-getAllUsers', (req,res) => {
                 if(error) {
                     console.log(error)
                 }else{
-                    console.log(result)
+                    // console.log(result)
                         res.send(result)
                 }
             })
@@ -273,7 +274,7 @@ app.post('/messenger-api-getAllUsers', (req,res) => {
 /////////////////////////////////////////////////////////////////////////////////////// ADD USER TO CONVERSATIONS LIST
 
 app.post('/messenger-api-addUserToConversationList', (req,res) => {
-    console.log(req.body)
+    // console.log(req.body)
     MongoClient.connect(mongodbURL, {}, (error,client) => {
         if(error) console.log('Cannot connect to the database', error)
         else{
@@ -309,7 +310,7 @@ app.post('/messenger-api-addUserToConversationList', (req,res) => {
                     console.log(error)
                 }else{
                     console.log('....................................................................')
-                    console.log(result)
+                    // console.log(result)
                     res.send(result)
                 }
             })

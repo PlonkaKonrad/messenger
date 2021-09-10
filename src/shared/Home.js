@@ -67,31 +67,31 @@ const Home = (props) => {
 
     const getMessages = (id) => {
         setcurrentSomeone(id)
-        fetch('/messenger-api-getMessages', {
-            method: 'POST',
-            body:JSON.stringify({
-                id1: props.state.userID,
-                id2: id
-            }),
-            headers: {
-                "Content-Type":"application/json"
-            }
-        })
-        .then(result=> result.json())
-        .then(data => {
-            console.log(data)
-                if(data.length>0){
-                    setmessages(data[0].messages)
+        // fetch('/messenger-api-getMessages', {
+        //     method: 'POST',
+        //     body:JSON.stringify({
+        //         id1: props.state.userID,
+        //         id2: id
+        //     }),
+        //     headers: {
+        //         "Content-Type":"application/json"
+        //     }
+        // })
+        // .then(result=> result.json())
+        // .then(data => {
+        //     console.log(data)
+        //         if(data.length>0){
+        //             setmessages(data[0].messages)
 
-                    data[0].users.forEach(user => {
-                        if(user !== props.state.userID){
-                            getUser(user)
-                        }
-                    })
-                }else{
-                    setmessages([[{from:"none",to:"someone",content:"Napisz coś",createdAt:new Date()}]])
-                }
-        })
+        //             data[0].users.forEach(user => {
+        //                 if(user !== props.state.userID){
+        //                     getUser(user)
+        //                 }
+        //             })
+        //         }else{
+        //             setmessages([[{from:"none",to:"someone",content:"Napisz coś",createdAt:new Date()}]])
+        //         }
+        // })
     }
 
 
