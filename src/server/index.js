@@ -94,7 +94,7 @@ app.post('/messenger-api-register', (req,res) => {
                                 userSurname: req.body.surname,
                                 userEmail: req.body.email,
                                 userPassword: passwordHash.generate(req.body.password),
-                                userImage: 'https://cdn.pixabay.com/photo/2018/04/18/18/56/user-3331257__340.png',
+                                userImage: 'https://image.flaticon.com/icons/png/512/149/149071.png',
                                 createdAt: new Date(),
                                 lastLogin: new Date(),
                             }, (error, result)=>{
@@ -188,10 +188,10 @@ app.post('/messenger-api-getConversationsList', (req,res) => {
                     console.log('Brak listy znajomych')
 
                     res.send({message:'Brak listy znajomych', error: true})
-                }else if(result.length > 0){
+                }else if(result.length > 0){  
 
                         res.send(result)
-                    
+
                 }
         })
 
@@ -271,7 +271,7 @@ app.post('/messenger-api-getAllUsers', (req,res) => {
 /////////////////////////////////////////////////////////////////////////////////////// ADD USER TO CONVERSATIONS LIST
 
 app.post('/messenger-api-addUserToConversationList', (req,res) => {
-    // console.log(req.body)
+
     MongoClient.connect(mongodbURL, {}, (error,client) => {
         if(error) console.log('Cannot connect to the database', error)
         else{
@@ -285,6 +285,7 @@ app.post('/messenger-api-addUserToConversationList', (req,res) => {
                     console.log(error)
                 }else{ 
 
+                    
                     if(result[0].conversations.some(conversation => conversation.userID === req.body.someoneID)){
                         res.send({error:'contactAlreadyAdded',message: 'Użytkownik został już dodany'})
                     }else{
@@ -305,60 +306,19 @@ app.post('/messenger-api-addUserToConversationList', (req,res) => {
                 
                             },{
                                 upsert: true,
+                            },() => {
+                                res.send(result)
                             })
 
+
+                           
                     }
 
 
-
-
-                    res.end()
+                 
                 }
             })
 
-            
-        
-          
-            // db.collection('ConversationsLists').findOneAndUpdate({
-            //     userID: req.body.userID
-            // },{
-                
-            
-            //     $addToSet:{conversations:{
-            //         userID: req.body.someoneID,
-            //         lastMsg: req.body.lastMsg,
-            //         createdAt: new Date(),
-            //         userName: req.body.userName,
-            //         userSurname: req.body.userSurname
-            //     }}
-
-
-            // },{
-            //     upsert: true,
-            // }),
-           
-
-            // db.collection("ConverstationsLists").find({
-            //     userID: req.body.userID
-            // }).toArray((error,result) => {
-            
-            // })
-           
-            
-
-            // db.collection('ConversationsLists').find({
-            //     userID: req.body.userID   
-            // }).toArray((error,result) => {
-            //     if(error) {
-            //         console.log(error)
-            //     }else{
-            //         console.log('....................................................................')
-            //         // console.log(result)
-            //         res.send(result)
-            //     }
-            // })
-          
-            
         }    
         
     })

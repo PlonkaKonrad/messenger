@@ -22,26 +22,7 @@ const Home = (props) => {
 
     
     useEffect(() => {
-        fetch('/messenger-api-getConversationsList',{
-            method: "POST",
-            body: JSON.stringify({
-                userID: props.state.userID // zmienić na dynamiczne
-            }),
-            headers: {
-                "Content-Type":"application/json"
-            }
-
-        })
-        .then(response => response.json())
-        .then(data => {
-
-            sessionStorage.setItem('conversationsList', JSON.stringify(data[0].conversations))
-            if(!isconversationsLoaded){
-                setconversations(JSON.parse(sessionStorage.getItem('conversationsList')))
-            }
-            setisconversationsLoaded(true)
-
-        })
+        getConversationsList()
     });
 
     const getUser = (id) => {
@@ -104,6 +85,33 @@ const Home = (props) => {
         })
     }
 
+    const getConversationsList = () => {
+        fetch('/messenger-api-getConversationsList',{
+            method: "POST",
+            body: JSON.stringify({
+                userID: props.state.userID // zmienić na dynamiczne
+            }),
+            headers: {
+                "Content-Type":"application/json"
+            }
+
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            
+
+
+            sessionStorage.setItem('conversationsList', JSON.stringify(data[0].conversations))
+            if(isconversationsLoaded == false){
+                setconversations(JSON.parse(sessionStorage.getItem('conversationsList')))
+                console.log(conversations)
+            }
+            setisconversationsLoaded(true)
+
+        })
+    }
+
 
 
 
@@ -115,6 +123,8 @@ const Home = (props) => {
                 getMessages = {getMessages}
                 state = {props.state}
                 getUser = {getUser}
+                getConversationsList={getConversationsList}
+                setisconversationsLoaded ={setisconversationsLoaded}
             />
             <Messages 
                 messages = {messages}
@@ -249,7 +259,6 @@ const Contacts = (props) => {
     }
 
     const addUserToConversationList = (someoneID,userName,userSurname) => {
-        console.log('asi')
         fetch('/messenger-api-addUserToConversationList', {
             method: 'POST',
             headers: {
@@ -265,9 +274,12 @@ const Contacts = (props) => {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data)
-            props.setconversations(data)
+            
+            props.setisconversationsLoaded(false)
+            props.getConversationsList()
+            setmodalOpened(false)
         })
+
     }
  
 
