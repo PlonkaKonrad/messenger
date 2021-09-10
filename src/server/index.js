@@ -190,8 +190,6 @@ app.post('/messenger-api-getConversationsList', (req,res) => {
                     res.send({message:'Brak listy znajomych', error: true})
                 }else if(result.length > 0){
 
-
-                        console.log('Znaleziono listę znajomych')
                         res.send(result)
                     
                 }
@@ -214,7 +212,6 @@ app.post('/messenger-api-getMessages', (req,res) => {
                 if(error) {
                     console.log(error)
                 }else{
-                    console.log(result)
                         res.send(result)
                 }
             })
@@ -279,41 +276,87 @@ app.post('/messenger-api-addUserToConversationList', (req,res) => {
         if(error) console.log('Cannot connect to the database', error)
         else{
             const db = client.db(mongodbNAME)
-        
-          
-            db.collection('ConversationsLists').findOneAndUpdate({
-                userID: req.body.userID
-            },{
 
-
-                $addToSet:{conversations:{
-                    userID: req.body.someoneID,
-                    lastMsg: req.body.lastMsg,
-                    createdAt: new Date(),
-                    userName: req.body.userName,
-                    userSurname: req.body.userSurname
-                }}
-
-
-
-
-            },{
-                // new: true,
-                upsert: true,
-            }),
-            
 
             db.collection('ConversationsLists').find({
                 userID: req.body.userID   
             }).toArray((error,result) => {
                 if(error) {
                     console.log(error)
-                }else{
-                    console.log('....................................................................')
-                    // console.log(result)
-                    res.send(result)
+                }else{ 
+
+                    if(result[0].conversations.some(conversation => conversation.userID === req.body.someoneID)){
+                        res.send({error:'contactAlreadyAdded',message: 'Użytkownik został już dodany'})
+                    }else{
+
+                        db.collection('ConversationsLists').findOneAndUpdate({
+                                userID: req.body.userID
+                            },{
+                                
+                            
+                                $addToSet:{conversations:{
+                                    userID: req.body.someoneID,
+                                    lastMsg: req.body.lastMsg,
+                                    createdAt: new Date(),
+                                    userName: req.body.userName,
+                                    userSurname: req.body.userSurname
+                                }}
+                
+                
+                            },{
+                                upsert: true,
+                            })
+
+                    }
+
+
+
+
+                    res.end()
                 }
             })
+
+            
+        
+          
+            // db.collection('ConversationsLists').findOneAndUpdate({
+            //     userID: req.body.userID
+            // },{
+                
+            
+            //     $addToSet:{conversations:{
+            //         userID: req.body.someoneID,
+            //         lastMsg: req.body.lastMsg,
+            //         createdAt: new Date(),
+            //         userName: req.body.userName,
+            //         userSurname: req.body.userSurname
+            //     }}
+
+
+            // },{
+            //     upsert: true,
+            // }),
+           
+
+            // db.collection("ConverstationsLists").find({
+            //     userID: req.body.userID
+            // }).toArray((error,result) => {
+            
+            // })
+           
+            
+
+            // db.collection('ConversationsLists').find({
+            //     userID: req.body.userID   
+            // }).toArray((error,result) => {
+            //     if(error) {
+            //         console.log(error)
+            //     }else{
+            //         console.log('....................................................................')
+            //         // console.log(result)
+            //         res.send(result)
+            //     }
+            // })
           
             
         }    
